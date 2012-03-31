@@ -24,7 +24,7 @@ Create a new Twitter application with read & write access and manually create an
 
 Rename the `settings.yml.sample` to `settings.yml` and have a look inside. Add the connection string for the database you created, the Twitter user you used to create the application, the consumer key and consumer secret as well as the access token and access token secret.
 
-Set the maximum liftime for a status with the `lifetime_in_months` setting in the archiving section. All statuses created more than x months ago will be removed from Twitter (but kept in the local database).
+Set the maximum lifetime for a status with the `lifetime_in_months` setting in the archiving section. All statuses created more than x months ago will be removed from Twitter (but kept in the local database).
 
 ## How to use
 
