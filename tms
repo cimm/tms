@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH << "app"
+
+require "logger"
+require "application"
+
+$log = Logger.new(STDOUT)
+Application.start
+$log.info("Archiving statuses...")
+Application.archive_statuses
+$log.info("Taking old statuses offline...")
+Application.take_old_statuses_offline
