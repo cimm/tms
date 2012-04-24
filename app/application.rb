@@ -22,11 +22,11 @@ class Application
   end
 
   def self.take_old_statuses_offline
-    old_online_statuses = Status.old_and_online
-    $log.info("Found #{old_online_statuses.count} old online statuses")
-    if old_online_statuses.any?
+    old_statuses_not_removed = Status.old_and_not_removed
+    $log.info("Found #{old_statuses_not_removed.count} old statuses")
+    if old_statuses_not_removed.any?
       access_token = Authentication.access_token
-      old_online_statuses.each do |status|
+      old_statuses_not_removed.each do |status|
         status.take_offline(access_token)
       end
     end

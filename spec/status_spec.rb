@@ -34,19 +34,9 @@ describe Status do
     status.errors.should have_key(:created_at)
   end
 
-  it "knows if it is still available online" do
-    status.should respond_to(:online?)
-    status.should respond_to(:online=)
-  end
-
-  it "is not valid without knowing if it is still available online" do
-    status.online = nil
-    status.should_not be_valid
-    status.errors.should have_key(:online)
-  end
-
-  it "is online by default" do
-    status.should be_online
+  it "has the date it was removed" do
+    status.should respond_to(:removed_at)
+    status.should respond_to(:removed_at=)
   end
 
   it "knows if it was favorited" do
@@ -144,21 +134,21 @@ describe Status do
     end
   end
 
-  describe "self.online" do
-    let(:online_statuses) { [mock("Status")] }
-    let(:query)           { { :online => true } }
+  describe "self.not_removed" do
+    let(:available_statuses) { [mock("Status")] }
+    let(:query)              { { :removed_at => nil } }
 
     before :each do
-      Status.stub(:all => online_statuses)
+      Status.stub(:all => available_statuses)
     end
 
-    it "gets all the online statuses" do
+    it "gets all the statuses that are not yet removed" do
       Status.should_receive(:all).with(query)
-      Status.online
+      Status.not_removed
     end
 
-    it "returns all the online statuses" do
-      Status.online.should eql online_statuses
+    it "returns all the statuses that are not yet removed" do
+      Status.not_removed.should eql available_statuses
     end
   end
 
@@ -175,28 +165,28 @@ describe Status do
     end
   end
 
-  describe "self.old_and_online" do
-    let(:old_online_status)       { mock("Old online status") }
-    let(:old_statuses)            { [mock("Old offline status"), old_online_status] }
-    let(:old_and_online_statuses) { [old_online_status] }
+  describe "self.old_and_not_removed" do
+    let(:old_status_not_removed)   { mock("Old status not removed") }
+    let(:old_statuses)             { [mock("Old removed status"), old_status_not_removed] }
+    let(:old_statuses_not_removed) { [old_status_not_removed] }
 
     before :each do
       Status.stub(:old => old_statuses)
-      old_statuses.stub(:online => old_and_online_statuses)
+      old_statuses.stub(:not_removed => old_statuses_not_removed)
     end
 
     it "gets all the old statuses" do
       Status.should_receive(:old)
-      Status.old_and_online
+      Status.old_and_not_removed
     end
 
-    it "keeps only the online statuses from the old statuses" do
-      old_statuses.should_receive(:online)
-      Status.old_and_online
+    it "keeps only the statuses that are not yet removed from the old statuses" do
+      old_statuses.should_receive(:not_removed)
+      Status.old_and_not_removed
     end
 
-    it "returns only the old statuses that are still online" do
-      Status.old_and_online.should eql old_and_online_statuses
+    it "returns only the old statuses that are not yet removed" do
+      Status.old_and_not_removed.should eql old_statuses_not_removed
     end
   end
 
@@ -396,8 +386,14 @@ describe Status do
     end
 
     context "when the post was successful" do
-      it "flags the status as offline" do
-        status.should_receive(:update).with(:online => false)
+      let(:now) { Time.now }
+
+      before :each do
+        Time.stub(:now => now)
+      end
+
+      it "update the date the status was removed" do
+        status.should_receive(:update).with(:removed_at => now)
         status.take_offline(access_token)
       end
     end

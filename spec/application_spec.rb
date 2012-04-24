@@ -62,37 +62,37 @@ describe Application do
   end
 
   describe "self.take_old_statuses_offline" do
-    let(:old_online_status)   { mock("Old online status") }
-    let(:old_online_statuses) { [old_online_status] }
-    let(:access_token)        { mock("Access token") }
+    let(:old_status_not_removed)   { mock("Old status not removed") }
+    let(:old_statuses_not_removed) { [old_status_not_removed] }
+    let(:access_token)             { mock("Access token") }
 
     before :each do
-      Status.stub(:old_and_online => old_online_statuses)
+      Status.stub(:old_and_not_removed => old_statuses_not_removed)
       Authentication.stub(:access_token => access_token)
-      old_online_status.stub(:take_offline)
+      old_status_not_removed.stub(:take_offline)
     end
 
-    it "gets the old but still online statuses" do
-      Status.should_receive(:old_and_online)
+    it "gets the old statuses that have not been removed" do
+      Status.should_receive(:old_and_not_removed)
       Application.take_old_statuses_offline
     end
 
-    context "when some old statuses are still online" do
+    context "when some old statuses have not been removed" do
       it "gets the access token" do
         Authentication.should_receive(:access_token)
         Application.take_old_statuses_offline
       end
 
-      it "takes each of the old but still online statuses offline" do
-        old_online_statuses.each do |s|
+      it "takes each of the old statuses that have not been removed offline" do
+        old_statuses_not_removed.each do |s|
           s.should_receive(:take_offline).with(access_token)
         end
         Application.take_old_statuses_offline
       end
     end
 
-    context "when there are no old statuses or none are still online" do
-      let(:old_online_statuses) { [] }
+    context "when there are no old statuses or they are all removed" do
+      let(:old_statuses_not_removed) { [] }
 
       it "does not get the access token" do
         Authentication.should_not_receive(:access_token)

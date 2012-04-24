@@ -13,7 +13,7 @@ class Status
 
   property :id,                    String, :key => true
   property :created_at,            DateTime, :required => true
-  property :online,                Boolean, :required => true, :default => true
+  property :removed_at,            DateTime
   property :favorited,             Boolean, :required => true, :default => false
   property :retweet_count,         Integer
   property :truncated,             Boolean, :required => true, :default => false
@@ -27,8 +27,8 @@ class Status
     all(:created_at.lte => old_status_date)
   end
 
-  def self.online
-    all(:online => true)
+  def self.not_removed
+    all(:removed_at => nil)
   end
 
   def self.old_status_date
@@ -39,8 +39,8 @@ class Status
     any? ? last.id : "1"
   end
 
-  def self.old_and_online
-    old.online
+  def self.old_and_not_removed
+    old.not_removed
   end
 
   def self.from_raw_status(raw_status)
@@ -61,10 +61,10 @@ class Status
   def take_offline(access_token)
     response = access_token.post(take_offline_url)
     if response.code == HTTP_SUCCESS_CODE
-      update(:online => false)
-      $log.info("Status #{id} taken offline")
+      update(:removed_at => Time.now)
+      $log.info("Status #{id} removed")
     else
-      $log.warn("Failed to take status #{id} offline (#{response.code})")
+      $log.warn("Failed to remove status #{id} (#{response.code})")
     end
   end
 
