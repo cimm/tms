@@ -1,40 +1,40 @@
 class RawStatus
   XML_SCHEMA_DATE_FORMAT = "%a %b %d %H:%M:%S %z %Y"
 
-  def initialize(raw_status)
-    @raw_status = raw_status
+  def initialize(json_status_json)
+    @json_status_json = json_status_json
   end
 
   def id
-    @raw_status["id_str"]
+    @json_status_json["id_str"]
   end
 
   def from_user_id
-    @raw_status["user"]["id_str"]
+    @json_status_json["user"]["id_str"]
   end
 
   def created_at
-    DateTime.strptime(@raw_status["created_at"], XML_SCHEMA_DATE_FORMAT)
+    DateTime.strptime(@json_status_json["created_at"], XML_SCHEMA_DATE_FORMAT)
   end
 
   def favorited?
-    @raw_status["favorited"]
+    @json_status_json["favorited"]
   end
 
   def retweeted?
-    @raw_status["retweeted"]
+    @json_status_json["retweeted"]
   end
 
   def retweet_count
-    @raw_status["retweet_count"]
+    @json_status_json["retweet_count"]
   end
 
   def truncated?
-    @raw_status["truncated"]
+    @json_status_json["truncated"]
   end
 
   def coordinates
-    @raw_status["coordinates"] || []
+    @json_status_json["coordinates"] || []
   end
 
   def latitude
@@ -46,14 +46,14 @@ class RawStatus
   end
 
   def in_reply_to_user_id
-    @raw_status["in_reply_to_user_id_str"]
+    @json_status_json["in_reply_to_user_id_str"]
   end
 
   def in_reply_to_status_id
-    @raw_status["in_reply_to_status_id_str"]
+    @json_status_json["in_reply_to_status_id_str"]
   end
 
   def text
-    @raw_status["text"]
+    @json_status_json["text"]
   end
 end
