@@ -15,7 +15,7 @@ describe PublicTimeline do
   describe :raw_timeline do
     let(:timeline_url) { "Timeline URL" }
     let(:url_handle)   { mock("URL handle") }
-    let(:raw_timeline) { mock("URL handle") }
+    let(:raw_timeline) { mock("Raw timeline") }
 
     before :each do
       public_timeline.stub(:timeline_url => timeline_url, :open => url_handle)
