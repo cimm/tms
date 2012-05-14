@@ -35,7 +35,7 @@ describe Application do
       Status.stub(:last_id => last_id)
       PublicTimeline.stub(:new => public_timeline)
       public_timeline.stub(:statuses => statuses)
-      status.stub(:save!)
+      status.stub(:save! => nil, :classify => nil)
     end
 
     it "gets the id of the last archived status" do
@@ -50,6 +50,13 @@ describe Application do
 
     it "gets the new statuses from the public timeline" do
       public_timeline.should_receive(:statuses)
+      Application.archive_statuses
+    end
+
+    it "classifies each of these statuses" do
+      statuses.each do |s|
+        s.should_receive(:classify)
+      end
       Application.archive_statuses
     end
 

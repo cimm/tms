@@ -1,5 +1,6 @@
 require "data_mapper"
 require "settings"
+require "classification"
 
 class Status
   include DataMapper::Resource
@@ -22,6 +23,9 @@ class Status
   property :in_reply_to_user_id,   String
   property :in_reply_to_status_id, String
   property :text,                  String, :required => true, :length => MAXIMUM_STATUS_LENGTH
+  property :happy_score,           Integer
+
+  validates_within :happy_score, :set => 0..100
 
   def self.old
     all(:created_at.lte => old_status_date)
@@ -56,6 +60,10 @@ class Status
     status.in_reply_to_status_id = raw_status.in_reply_to_status_id
     status.text                  = raw_status.text
     status
+  end
+
+  def classify
+    self.happy_score = Classification.happy_score_for_text(text)
   end
 
   def take_offline(access_token)

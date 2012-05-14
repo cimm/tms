@@ -17,6 +17,7 @@ class Application
   def self.archive_statuses
     public_timeline = PublicTimeline.new(TWITTER_USER, Status.last_id)
     public_timeline.statuses.each do |status|
+      status.classify
       status.save!
     end
   end

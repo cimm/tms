@@ -110,6 +110,20 @@ describe Status do
     status.errors[:text].should include("Text must be at most 144 characters long")
   end
 
+  it "has a happy score" do
+    status.should respond_to(:happy_score)
+    status.should respond_to(:happy_score=)
+  end
+
+  it "has a happy score between 0 and 100" do
+    status.happy_score = -1
+    status.should_not be_valid
+    status.errors[:happy_score].should include("Happy score must be between 0 and 100")
+    status.happy_score = 101
+    status.should_not be_valid
+    status.errors[:happy_score].should include("Happy score must be between 0 and 100")
+  end
+
   describe "self.old" do
     let(:old_status_date) { mock("Old status date") }
     let(:query)           { {:created_at.lte => old_status_date } }
@@ -361,6 +375,31 @@ describe Status do
 
     it "returns the new status" do
       Status.from_raw_status(raw_status).should eql status
+    end
+  end
+
+  describe :classify do
+    let(:text)        { mock("Text") }
+    let(:happy_score) { mock("Happy score") }
+
+    before :each do
+      status.stub(:text => text)
+      Classification.stub(:happy_score_for_text => happy_score)
+    end
+
+    it "gets the text from the status" do
+      status.should_receive(:text)
+      status.classify
+    end
+
+    it "calculates the happy score for this text" do
+      Classification.should_receive(:happy_score_for_text).with(text)
+      status.classify
+    end
+
+    it "sets the status happy score to this calculated score" do
+      status.should_receive(:happy_score=).with(happy_score)
+      status.classify
     end
   end
 
